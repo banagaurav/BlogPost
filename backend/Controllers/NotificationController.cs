@@ -17,7 +17,20 @@ public class NotificationController : ControllerBase
     [HttpGet]
     public IActionResult GetNotifications()
     {
-        var userId = int.Parse(User.FindFirst("id").Value); // Assuming JWT contains 'id'
+        // Ensure the 'id' claim exists
+        var idClaim = User.FindFirst("id");
+        if (idClaim == null)
+        {
+            return Unauthorized(new { Message = "User ID claim is missing from the token." });
+        }
+
+        // Parse user ID
+        if (!int.TryParse(idClaim.Value, out var userId))
+        {
+            return BadRequest(new { Message = "Invalid user ID in token." });
+        }
+
+        // Fetch notifications for the user
         var notifications = _context.Notifications
             .Where(n => n.UserId == userId)
             .OrderByDescending(n => n.CreatedAt)

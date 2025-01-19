@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using backend.Models;
-using Microsoft.Extensions.Options;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 
 public class AppDbContext : DbContext
