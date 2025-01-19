@@ -26,5 +26,8 @@ namespace backend.Models
         [Required]
         [StringLength(10)]
         public string Role { get; set; } = "User"; // Default role
+
+        // Navigation property for Notifications
+        public ICollection<Notification> Notifications { get; set; }
     }
 }

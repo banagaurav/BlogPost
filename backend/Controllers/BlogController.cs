@@ -32,6 +32,17 @@ namespace backend.Controllers
             _context.Blogs.Add(blog);
             _context.SaveChanges();
 
+            // Notify all users
+            var users = _context.Users.ToList();
+            var notifications = users.Select(user => new Notification
+            {
+                UserId = user.Id,
+                Message = $"A new blog titled '{blog.Title}' has been posted!",
+            }).ToList();
+
+            _context.Notifications.AddRange(notifications);
+            _context.SaveChanges();
+
             return Ok(new { Message = "Blog created successfully.", BlogId = blog.Id });
         }
 

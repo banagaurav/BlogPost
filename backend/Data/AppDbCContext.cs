@@ -9,6 +9,8 @@ public class AppDbContext : DbContext
 
     public DbSet<User> Users { get; set; }
     public DbSet<Blog> Blogs { get; set; }
+    public DbSet<Notification> Notifications { get; set; }
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         base.OnConfiguring(optionsBuilder);
@@ -33,6 +35,11 @@ public class AppDbContext : DbContext
             Gmail = "admin@example.com"
         });
 
-        // You can seed other initial data here (e.g., blogs, roles, etc.)
+        modelBuilder.Entity<Notification>()
+          .HasOne(n => n.User) // A notification belongs to one user
+          .WithMany(u => u.Notifications) // A user has many notifications
+          .HasForeignKey(n => n.UserId) // Foreign key
+          .OnDelete(DeleteBehavior.Cascade); // Cascade delete
+
     }
 }
