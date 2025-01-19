@@ -9,6 +9,7 @@ public class AppDbContext : DbContext
     public DbSet<User> Users { get; set; }
     public DbSet<Blog> Blogs { get; set; }
     public DbSet<Notification> Notifications { get; set; }
+    public DbSet<Review> Reviews { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -23,6 +24,17 @@ public class AppDbContext : DbContext
 
         base.OnModelCreating(modelBuilder);
 
+        // Define composite unique key to prevent duplicate ratings by the same user for the same blog post
+        modelBuilder.Entity<Review>()
+          .HasIndex(r => new { r.BlogPostId, r.UserId })
+          .IsUnique();
+
+        modelBuilder.Entity<Notification>()
+          .HasOne(n => n.User) // A notification belongs to one user
+          .WithMany(u => u.Notifications) // A user has many notifications
+          .HasForeignKey(n => n.UserId) // Foreign key
+          .OnDelete(DeleteBehavior.Cascade); // Cascade delete
+
         // Seed Admin User
         modelBuilder.Entity<User>().HasData(new User
         {
@@ -33,12 +45,6 @@ public class AppDbContext : DbContext
             Role = "Admin",
             Gmail = "admin@example.com"
         });
-
-        modelBuilder.Entity<Notification>()
-          .HasOne(n => n.User) // A notification belongs to one user
-          .WithMany(u => u.Notifications) // A user has many notifications
-          .HasForeignKey(n => n.UserId) // Foreign key
-          .OnDelete(DeleteBehavior.Cascade); // Cascade delete
 
     }
 }

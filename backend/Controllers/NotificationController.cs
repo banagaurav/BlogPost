@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,13 +18,13 @@ public class NotificationController : ControllerBase
     [HttpGet]
     public IActionResult GetNotifications()
     {
-        // Ensure the 'id' claim exists
-        var idClaim = User.FindFirst("id");
+        var idClaim = User.FindFirst(ClaimTypes.NameIdentifier);
         if (idClaim == null)
         {
+            Console.WriteLine("ID claim not found in token.");
             return Unauthorized(new { Message = "User ID claim is missing from the token." });
         }
-
+        Console.WriteLine($"ID Claim Value: {idClaim.Value}");
         // Parse user ID
         if (!int.TryParse(idClaim.Value, out var userId))
         {
